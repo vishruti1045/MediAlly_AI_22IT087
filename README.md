@@ -5,3 +5,31 @@ Healthcare accessibility remains a challenge globally, with patients often strug
 
 The landscape of AI-driven Medical Symptom Assistants (MSAs) includes various commercial and academic approaches. However, many existing solutions either suffer from low accuracy, lack personalized recommendations, or fail to provide interpretability. Our proposed solution aims to bridge these gaps using a robust machine learning approach that improves accuracy, transparency, and reliability.
 
++------------------+
+|  User Input     |  <-- (Symptoms entered via text/voice)
++------------------+
+         |
+         v
++----------------------+
+|  NLP Symptom Parser  |  <-- (Extracts symptoms from input)
++----------------------+
+         |
+         v
++--------------------------+
+|  Machine Learning Model  |  <-- (Predicts possible diseases)
++--------------------------+
+         |
+         v
++--------------------------+
+|  Severity Assessment    |  <-- (Assigns risk score)
++--------------------------+
+         |
+         v
++--------------------------+
+|  Triage Recommendation  |  <-- (Home care / Doctor visit / Emergency)
++--------------------------+
+         |
+         v
++--------------------------+
+|  Final Advice to User  |  <-- (Displays disease prediction & next steps)
++--------------------------+
