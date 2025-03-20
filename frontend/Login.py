@@ -3,11 +3,8 @@ import requests
 
 API_URL = "http://127.0.0.1:5000"
 
-def login():
+def login(switch_page):
     st.subheader("🔑 Login to Your Account")
-
-    if "logged_in" not in st.session_state:
-        st.session_state.logged_in = False
 
     username = st.text_input("👤 Username")
     password = st.text_input("🔒 Password", type="password")
@@ -18,14 +15,19 @@ def login():
         else:
             try:
                 response = requests.post(API_URL + "/login", json={"username": username, "password": password})
-                
+                st.write("Response Status Code:", response.status_code)
+                st.write("Response Text:", response.text)  # Print response content
+
                 if response.status_code == 200:
                     st.session_state.logged_in = True
                     st.session_state.username = username
                     st.success("✅ Successfully logged in!")
-                    st.rerun()
+                    switch_page("Prediction")
                 else:
-                    error_msg = response.json().get("error", "Login failed.")
+                    try:
+                        error_msg = response.json().get("error", "Login failed.")  # Try parsing JSON
+                    except requests.exceptions.JSONDecodeError:
+                        error_msg = "Server did not return JSON. Check backend logs."
                     st.error(f"❌ {error_msg}")
 
             except requests.exceptions.ConnectionError:

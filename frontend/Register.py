@@ -3,7 +3,7 @@ import requests
 
 API_URL = "http://127.0.0.1:5000"
 
-def register():
+def register(switch_page):
     st.subheader("📝 Register for an Account")
 
     username = st.text_input("👤 Choose a Username")
@@ -17,7 +17,8 @@ def register():
                 response = requests.post(API_URL + "/register", json={"username": username, "password": password})
                 
                 if response.status_code == 201:
-                    st.success("✅ Registration successful! You can now log in.")
+                    st.success("✅ Registration successful! Now, please log in.")
+                    switch_page("Login")
                 else:
                     error_msg = response.json().get("error", "Registration failed.")
                     st.error(f"❌ {error_msg}")
