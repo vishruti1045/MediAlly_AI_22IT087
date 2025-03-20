@@ -36,11 +36,14 @@ except Exception as e:
     exit(1)
 
 # ✅ Load Label Encoder
-try:
-    label_encoder = joblib.load("label_encoder.pkl")
-except FileNotFoundError:
-    print("❌ label_encoder.pkl not found!")
-    label_encoder = None
+LABEL_ENCODER_PATH = "label_encoder.pkl"
+
+if os.path.exists(LABEL_ENCODER_PATH):
+    label_encoder = joblib.load(LABEL_ENCODER_PATH)
+    print("✅ Label encoder loaded successfully!")
+else:
+    print("❌ label_encoder.pkl not found! Please check the file path.")
+    label_encoder = None  # Set to None to prevent crashes
 
 # ✅ Load BioBERT
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
