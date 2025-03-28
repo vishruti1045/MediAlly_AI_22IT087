@@ -1,42 +1,35 @@
 import streamlit as st
+from Home import home
+from Login import login
+from Register import register
+from Prediction import prediction
 
-st.set_page_config(page_title="MediAlly - Symptom Assistant", page_icon="🩺", layout="wide")
-
-# Initialize session state
+# ✅ Initialize session state
 if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "username" not in st.session_state:
-    st.session_state.username = None
+    st.session_state["logged_in"] = False
 if "page" not in st.session_state:
-    st.session_state.page = "Home"
+    st.session_state["page"] = "home"
 
-# Function to change pages
-def switch_page(page):
-    st.session_state.page = page
-    st.rerun()
-
-# Sidebar Navigation
+# ✅ Sidebar Navigation
 st.sidebar.title("🔍 MediAlly Navigation")
-if st.session_state.logged_in:
-    st.sidebar.write(f"👋 Welcome, **{st.session_state.username}**")
-    # if st.sidebar.button("🔴 Logout", key="logout_button"):
 
-    #     st.session_state.logged_in = False
-    #     st.session_state.username = None
-    #     switch_page("Home")
+if st.session_state["logged_in"]:
+    st.sidebar.success(f"👋 Welcome, **{st.session_state.get('username', 'User')}**")
+
+    if st.sidebar.button("🔴 Logout"):
+        st.session_state.clear()
+        st.session_state["logged_in"] = False
+        st.rerun()
 else:
-    st.sidebar.write("🚀 Please login or register to continue.")
-    
-# Page Routing
-if st.session_state.page == "Home":
-    from Home import home
-    home(switch_page)
-elif st.session_state.page == "Login":
-    from Login import login
-    login(switch_page)
-elif st.session_state.page == "Register":
-    from Register import register
-    register(switch_page)
-elif st.session_state.page == "Prediction":
-    from Prediction import prediction
+    page = st.sidebar.radio("Navigation", ["Home", "Login", "Register"])
+    st.session_state["page"] = page.lower()
+
+# ✅ Page Routing
+if st.session_state["page"] == "home":
+    home()
+elif st.session_state["page"] == "login":
+    login()
+elif st.session_state["page"] == "register":
+    register()
+elif st.session_state["page"] == "prediction":
     prediction()

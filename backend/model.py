@@ -3,6 +3,7 @@ import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModel
 import os
 import joblib
+import requests  # ✅ Import requests
 
 # ✅ Define SymptomClassifier BEFORE loading the model
 class SymptomClassifier(torch.nn.Module):
@@ -24,7 +25,17 @@ class SymptomClassifier(torch.nn.Module):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ✅ Load BioBERT tokenizer and model
-tokenizer = AutoTokenizer.from_pretrained("dmis-lab/biobert-base-cased-v1.1")
+# Disable SSL verification globally (use only if necessary)
+os.environ["CURL_CA_BUNDLE"] = ""
+
+# Fix SSL issue for Hugging Face requests
+requests.packages.urllib3.disable_warnings()
+
+tokenizer = AutoTokenizer.from_pretrained(
+    "dmis-lab/biobert-base-cased-v1.1",
+    use_auth_token=False,
+    trust_remote_code=True  # Optional: trusts remote code execution
+)
 biobert_model = AutoModel.from_pretrained("dmis-lab/biobert-base-cased-v1.1").to(device)
 
 # ✅ Define model path

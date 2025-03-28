@@ -3,32 +3,40 @@ import requests
 
 API_URL = "http://127.0.0.1:5000"
 
-def login(switch_page):
-    st.subheader("🔑 Login to Your Account")
-
+def login(switch_page=None):
+    st.subheader("🔐 Login to Your Account")
+    
     username = st.text_input("👤 Username")
     password = st.text_input("🔒 Password", type="password")
 
-    if st.button("🚀 Login"):
-        if not username or not password:
-            st.warning("⚠️ Please enter both username and password.")
+    if st.button("🔓 Login"):
+        response = requests.post(f"{API_URL}/login", json={
+            "username": username, "password": password
+        })
+        result = response.json()
+
+        if response.status_code == 200:
+            st.success("✅ OTP sent to email and phone! Verify to proceed.")
+            st.session_state["username"] = username
+            switch_page("verify_login_otp")
         else:
-            try:
-                response = requests.post(API_URL + "/login", json={"username": username, "password": password})
-                st.write("Response Status Code:", response.status_code)
-                st.write("Response Text:", response.text)  # Print response content
+            st.error(f"❌ {result.get('error', 'Login failed')}")
 
-                if response.status_code == 200:
-                    st.session_state.logged_in = True
-                    st.session_state.username = username
-                    st.success("✅ Successfully logged in!")
-                    switch_page("Prediction")
-                else:
-                    try:
-                        error_msg = response.json().get("error", "Login failed.")  # Try parsing JSON
-                    except requests.exceptions.JSONDecodeError:
-                        error_msg = "Server did not return JSON. Check backend logs."
-                    st.error(f"❌ {error_msg}")
+def verify_login_otp(switch_page=None):
+    st.subheader("🔑 Verify Login OTP")
+    
+    otp_email = st.text_input("📧 Enter Email OTP")
+    otp_phone = st.text_input("📱 Enter Mobile OTP")
 
-            except requests.exceptions.ConnectionError:
-                st.error("❌ Unable to connect to backend.")
+    if st.button("✅ Verify & Login"):
+        response = requests.post(f"{API_URL}/verify_login_otp", json={
+            "username": st.session_state["username"], "otp_email": otp_email, "otp_phone": otp_phone
+        })
+        result = response.json()
+
+        if response.status_code == 200:
+            st.session_state["logged_in"] = True
+            st.success("🎉 Login successful!")
+            switch_page("prediction")  # Redirect to the prediction page
+        else:
+            st.error(f"❌ {result.get('error', 'OTP verification failed')}")
