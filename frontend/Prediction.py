@@ -26,7 +26,7 @@ if not logger.hasHandlers():
 
 def prediction(switch_page):
     # Set background image
-    bg_base64 = get_base64_from_image("C:/MediAlly_AI/frontend/assets/bot.jpg")
+    bg_base64 = get_base64_from_image("C:/MediAlly_AI/frontend/assets/pred.jpg")
     st.markdown(f"""
     <style>
         .stApp {{
@@ -40,7 +40,7 @@ def prediction(switch_page):
             margin: 5rem auto;
             max-width: 800px;
             color: #ffffff;
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(16px);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             border: 1px solid rgba(255, 255, 255, 0.18);
@@ -51,8 +51,9 @@ def prediction(switch_page):
             border-radius: 12px !important;
             padding: 0.75rem !important;
             font-size: 1rem !important;
-            color: #000000 !important;
+            color: white !important;
         }}
+        
         .stButton>button {{
             background-color: #4A90E2;
             color: white;
@@ -63,6 +64,9 @@ def prediction(switch_page):
             font-weight: 600;
             margin-top: 1rem;
             transition: all 0.3s ease-in-out;
+        }}
+        .stSpinner div {{
+            color: white !important; /* Set spinner text color to white */
         }}
         .stButton>button:hover {{
             background-color: #357ABD;
@@ -91,11 +95,17 @@ def prediction(switch_page):
         return
 
     # 🔲 Start glass container
-    st.markdown('<div class="glass-prediction">', unsafe_allow_html=True)
+    # Glass Container for Symptom Checker
+    st.markdown("""
+    <div class="glass-prediction" id="symptom-checker">
+        <h2>🩺 Symptom Checker</h2>
+        <p style='font-size:1.2rem;'>
+            Describe your symptoms below and let our AI Assistant help you understand possible conditions.
+        </p>
+    """, unsafe_allow_html=True)
 
-    st.subheader("🩺 Medical Symptom Assistant")
-    symptoms = st.text_area("💬 Describe your symptoms...")
-
+    symptoms = st.text_area("Enter your symptoms", height=150, placeholder="E.g., I have a headache and sore throat...")
+    
     if st.button("Predict"):
         if not symptoms.strip():
             st.warning("⚠️ Please enter symptoms.")
@@ -135,18 +145,23 @@ def prediction(switch_page):
                             "Red": "🔴 Red (Emergency)",
                             "Orange": "🟠 Orange (Urgent)",
                             "Yellow": "🟡 Yellow (Doctor Visit)",
-                            "Green": "🟢 Green (Home Care)",
-                            "Blue": "🔵 Unknown"
+                            "Green": "🟢 Green (Home Care)"
                         }
-                        triage_display = triage_map.get(triage_category, "🔵 Unknown")
+                        triage_display = triage_map.get(triage_category)
 
                         if diseases:
                             st.markdown(f"""
-                            🔍 **Predicted Disease:** Possible Conditions: {", ".join(diseases[:3])}  
-                            🎯 **Confidence:** {max(confidences[:3]) * 100:.0f}%  
-                            🚑 **Triage Category:** {triage_display}  
-                            📌 **ICD-10 Code(s):** {', '.join([f"{code} ({d})" for code, d in zip(icd_codes[:3], diseases[:3])])}
-                            """)
+<div class="glass-prediction">
+    <h2>Predicted Disease:</h2>
+    <p>
+        <br>🔍 Possible Conditions: {", ".join(diseases[:3])} <br>
+        <br>🎯 Confidence: {max(confidences[:3]) * 1000:.0f}% <br>
+        <br>🚑 Triage Category: {triage_display} <br>
+        <br>📌 ICD-10 Code(s): {', '.join([f"{code} ({d})" for code, d in zip(icd_codes[:3], diseases[:3])])}
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
                         else:
                             st.warning("⚠️ No predictions available.")
                             logger.warning("No predictions returned")
@@ -157,4 +172,3 @@ def prediction(switch_page):
 
     # 🔲 End glass container
     st.markdown('</div>', unsafe_allow_html=True)
-

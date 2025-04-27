@@ -2,7 +2,7 @@ import streamlit as st
 import base64
 
 def home(switch_page):
-    img_path = "C:/MediAlly_AI/frontend/assets/home.jpg"
+    img_path = "C:/MediAlly_AI/frontend/assets/pred.jpg"
     with open(img_path, "rb") as image_file:
         encoded = base64.b64encode(image_file.read()).decode()
 

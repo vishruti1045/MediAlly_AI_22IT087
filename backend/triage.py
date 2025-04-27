@@ -47,22 +47,31 @@ def get_icd10_code(disease):
 
 # ✅ Triage Risk Category Function
 def triage_category(disease, confidence):
+    # Clean up the disease name
     disease = disease.strip().lower()
 
     # Fuzzy match to disease_risk_scores
     possible_match = get_close_matches(disease, [d.lower() for d in disease_risk_scores.keys()], n=1, cutoff=0.6)
+    
+    # Default risk score if no match found
+    risk_score = 3  # default risk score
+
     if possible_match:
         matched = next((d for d in disease_risk_scores if d.lower() == possible_match[0]), None)
         risk_score = disease_risk_scores.get(matched, 3)
-    else:
-        risk_score = 3  # default risk
 
-    # Determine triage level
-    if risk_score >= 7:
+    # Ensure confidence is between 0 and 1 (just in case)
+    if confidence < 0:
+        confidence = 0
+    elif confidence > 1:
+        confidence = 1
+
+    # Determine triage level based on risk score and confidence
+    if risk_score >= 7 or confidence >= 0.8:
         return "🔴 Red (Emergency)"
-    elif 4 <= risk_score <= 6:
+    elif 4 <= risk_score <= 6 or confidence >= 0.5:
+        return "🟠 Orange (Urgent)"
+    elif 0.2 <= confidence < 0.5:
         return "🟡 Yellow (Doctor Visit)"
-    elif confidence < 0.10:
-        return "🟢 Green (Uncertain - Home Care)"
     else:
         return "🟢 Green (Home Care)"
