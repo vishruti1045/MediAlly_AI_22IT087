@@ -3,41 +3,36 @@ import requests
 
 API_URL = "http://127.0.0.1:5000"
 
-def register(switch_page=None):
-    st.subheader("📝 Register a New Account")
-    
-    username = st.text_input("👤 Choose a Username")
-    password = st.text_input("🔒 Choose a Password", type="password")
-    email = st.text_input("📧 Enter Your Email")
-    phone = st.text_input("📱 Enter Your Mobile Number")
 
-    if st.button("📝 Register"):
-        if username and password and email and phone:
+def switch_page(page_name):
+    """Function to switch pages using session state."""
+    st.session_state["current_page"] = page_name
+    st.rerun()  # Refresh the UI
+    
+def register(switch_page):
+    st.title("📝 Register Page")
+
+    username = st.text_input("Username")
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Register"):
+        if username and email and password:
             response = requests.post(f"{API_URL}/register", json={
-                "username": username, "password": password, "email": email, "phone": phone
+                "username": username,
+                "email": email,
+                "password": password
             })
-            result = response.json()
 
-            if response.status_code == 201:
-                st.success("✅ OTP sent! Verify your account.")
-                st.session_state["username"] = username
-                switch_page("verify_register_otp")
+            if response.status_code == 200:
+                st.success("✅ Registration successful! Please login.")
+                switch_page("login")
             else:
-                st.error(f"❌ {result.get('error', 'Registration failed')}")
+                try:
+                    error_msg = response.json().get('error', 'Unknown error')
+                except requests.exceptions.JSONDecodeError:
+                    error_msg = response.text  # fallback to raw text if not JSON
 
-def verify_register_otp(switch_page=None):
-    st.subheader("🔑 Verify Registration OTP")
-    
-    otp_email = st.text_input("📧 Enter Email OTP")
-    
-    if st.button("✅ Verify"):
-        response = requests.post(f"{API_URL}/verify_register_otp", json={
-            "username": st.session_state["username"], "otp_email": otp_email
-        })
-        result = response.json()
-
-        if response.status_code == 200:
-            st.success("🎉 Account verified! You can now log in.")
-            switch_page("login")
+                st.error(f"❌ Error: {error_msg}")
         else:
-            st.error(f"❌ {result.get('error', 'OTP verification failed')}")
+            st.warning("⚠️ Please fill in all fields before submitting.")

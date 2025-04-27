@@ -5,6 +5,16 @@ import os
 import joblib
 import requests  # ✅ Import requests
 
+
+LABEL_ENCODER_PATH = os.getenv("LABEL_ENCODER_PATH", "label_encoder.pkl")
+
+if os.path.exists(LABEL_ENCODER_PATH):
+    label_encoder = joblib.load(LABEL_ENCODER_PATH)
+    print("✅ Label encoder loaded successfully!")
+else:
+    print("❌ label_encoder.pkl not found! Please check the file path.")
+    label_encoder = None
+
 # ✅ Define SymptomClassifier BEFORE loading the model
 class SymptomClassifier(torch.nn.Module):
     def __init__(self, input_size, num_classes):
@@ -53,16 +63,29 @@ else:
     print(f"❌ Model file not found at {MODEL_PATH}")
     symptom_model = None  # Model remains None if not found
 
+def get_bert_embedding(text_list):
+    tokens = tokenizer(text_list, return_tensors="pt", padding=True, truncation=True, max_length=512).to(device)
+    with torch.no_grad():
+        outputs = biobert_model(**tokens)
+        embedding = outputs.last_hidden_state[:, 0, :]  # Extract CLS token (768)
+    return embedding  # Shape: [batch_size, 768]
+
+
 # ✅ Define a function to make predictions
 def predict_disease(text, label_encoder):
     if symptom_model is None:
         raise ValueError("❌ Model is not loaded. Cannot make predictions.")
 
     # Ensure `get_bert_embedding` is defined somewhere
-    embedding = get_bert_embedding([text])  # You must define this function
+    embedding = get_bert_embedding([text])  # Shape: [1, 768]
+
+    if embedding.shape[1] != 768:
+        raise ValueError(f"Embedding shape mismatch! Expected [1, 768], got {embedding.shape}")
+
     with torch.no_grad():
-        output = symptom_model(embedding)
-        probabilities = F.softmax(output, dim=1)
+       output = symptom_model(embedding)  # Ensure model expects [1, 768]
+
+    probabilities = F.softmax(output, dim=1)
 
     top_prob, top_class = torch.topk(probabilities, 1)
     disease = label_encoder.inverse_transform([top_class[0].item()])[0]
