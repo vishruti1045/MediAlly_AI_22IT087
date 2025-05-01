@@ -5,6 +5,8 @@ Healthcare accessibility remains a challenge globally, with patients often strug
 
 The landscape of AI-driven Medical Symptom Assistants (MSAs) includes various commercial and academic approaches. However, many existing solutions either suffer from low accuracy, lack personalized recommendations, or fail to provide interpretability. Our proposed solution aims to bridge these gaps using a robust machine learning approach that improves accuracy, transparency, and reliability.
 
+<img src="C:\MediAlly_AI\frontend\assets\home1.png" width="650"/>
+
 How Does the Medical Symptom Assistant Work?
 Our AI-driven system follows a structured approach to analyze user input and provide meaningful insights:
 
@@ -30,9 +32,15 @@ The AI assigns a confidence score to each predicted condition and categorizes th
 
 🔴 Red (Emergency) — Urgent conditions that need immediate attention.
 
+<img src="C:\MediAlly_AI\frontend\assets\pred2.png" width="650"/>
+
+<img src="C:\MediAlly_AI\frontend\assets\pred3.png" width="650"/>
+
 🔹 Step 5: ICD-10 Code Mapping
 
 Each predicted disease is mapped to its corresponding ICD-10 code, making it easy for users to understand and communicate with healthcare professionals.
+
+<img src="C:\MediAlly_AI\frontend\assets\confusion matrix.png" width="650"/>
 
 ✅ Overall Accuracy: ~85% on test data.
 
