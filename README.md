@@ -40,7 +40,7 @@ The AI assigns a confidence score to each predicted condition and categorizes th
 
 Each predicted disease is mapped to its corresponding ICD-10 code, making it easy for users to understand and communicate with healthcare professionals.
 
-<img src="frontend\assets\confusion matrix.png" width="650"/>
+<img src="frontend\assets\accuracy.png" width="650"/>
 
 ✅ Overall Accuracy: ~85% on test data.
 
