@@ -141,13 +141,8 @@ def prediction(switch_page):
                                 st.warning(f"⚠️ Unexpected data format: {item}")
                                 logger.warning(f"Unexpected data format: {item}")
 
-                        triage_map = {
-                            "Red": "🔴 Red (Emergency)",
-                            "Orange": "🟠 Orange (Urgent)",
-                            "Yellow": "🟡 Yellow (Doctor Visit)",
-                            "Green": "🟢 Green (Home Care)"
-                        }
-                        triage_display = triage_map.get(triage_category)
+                        triage_display = triage_category or "🔵 Unknown"
+
 
                         if diseases:
                             st.markdown(f"""

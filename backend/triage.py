@@ -54,11 +54,11 @@ def triage_category(disease, confidence):
     possible_match = get_close_matches(disease, [d.lower() for d in disease_risk_scores.keys()], n=1, cutoff=0.6)
     
     # Default risk score if no match found
-    risk_score = 3  # default risk score
+    score = 3  # default risk score
 
     if possible_match:
         matched = next((d for d in disease_risk_scores if d.lower() == possible_match[0]), None)
-        risk_score = disease_risk_scores.get(matched, 3)
+        score = disease_risk_scores.get(matched, 3)
 
     # Ensure confidence is between 0 and 1 (just in case)
     if confidence < 0:
@@ -67,11 +67,13 @@ def triage_category(disease, confidence):
         confidence = 1
 
     # Determine triage level based on risk score and confidence
-    if risk_score >= 7 or confidence >= 0.8:
-        return "🔴 Red (Emergency)"
-    elif 4 <= risk_score <= 6 or confidence >= 0.5:
-        return "🟠 Orange (Urgent)"
-    elif 0.2 <= confidence < 0.5:
+     # **Better confidence-based thresholding**
+    if confidence < 0.10 and score <= 3:
+        return "🟢 Green (Home Care)"  # Low-confidence & low-risk disease → Green
+    elif score <= 3:
+        return "🟢 Green (Home Care)"
+    elif score <= 6:
         return "🟡 Yellow (Doctor Visit)"
     else:
-        return "🟢 Green (Home Care)"
+        return "🔴 Red (Emergency)"
+
