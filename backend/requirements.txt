@@ -1,0 +1,8 @@
+Flask
+flask-cors
+pymongo
+flask-bcrypt
+python-dotenv
+torch
+transformers
+joblib
